@@ -1,0 +1,140 @@
+LAMMPS (3 Mar 2020)
+# tensile deformation
+#1 general
+units		metal
+dimension	3
+atom_style      atomic
+neighbor        0.3 bin
+
+#2 structure
+boundary	p p p
+read_data	lammps.dat
+  orthogonal box = (0 0 0) to (14.0643 16.24 105.905)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  32 atoms
+  read_data CPU = 0.0193983 secs
+mass		1 72.64
+
+
+#4 potentials
+pair_style      sw
+pair_coeff      * * germanene.sw Ge
+
+velocity  all  create  300 458127641 mom yes  rot yes dist gaussian
+neighbor 2.0 bin
+neigh_modify delay 3
+fix getEqu  all  nvt temp 300 300 .5e-1
+thermo 10000
+timestep .5e-3
+run 100000
+Neighbor list info ...
+  update every 1 steps, delay 3 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 5.25257
+  ghost atom cutoff = 5.25257
+  binsize = 2.62628, bins = 6 7 41
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair sw, perpetual
+      attributes: full, newton on
+      pair build: full/bin/atomonly
+      stencil: full/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.08 | 3.08 | 3.08 Mbytes
+Step Temp E_pair E_mol TotEng Press 
+       0          300   -51.611169            0    -50.40905     42.98132 
+   10000    287.30354     -50.2268            0   -49.075557   -228.81489 
+   20000    284.53446   -50.299318            0    -49.15917     245.1641 
+   30000    260.26739   -50.322178            0    -49.27927    50.444525 
+   40000    242.05682   -50.270693            0   -49.300755    -20.53578 
+   50000    265.59583   -50.257527            0   -49.193267     216.3125 
+   60000     221.4166   -50.453629            0   -49.566398   -64.806489 
+   70000    346.43328   -50.560529            0   -49.172349   -187.89974 
+   80000    277.77781   -50.274244            0    -49.16117    112.78777 
+   90000    289.56588   -50.468377            0   -49.308068    -46.13605 
+  100000     245.7219   -50.094924            0   -49.110301    8.2090365 
+Loop time of 0.790051 on 1 procs for 100000 steps with 32 atoms
+
+Performance: 5468.004 ns/day, 0.004 hours/ns, 126574.158 timesteps/s
+100.0% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.69212    | 0.69212    | 0.69212    |   0.0 | 87.60
+Neigh   | 0.00023004 | 0.00023004 | 0.00023004 |   0.0 |  0.03
+Comm    | 0.022845   | 0.022845   | 0.022845   |   0.0 |  2.89
+Output  | 0.00011344 | 0.00011344 | 0.00011344 |   0.0 |  0.01
+Modify  | 0.056314   | 0.056314   | 0.056314   |   0.0 |  7.13
+Other   |            | 0.01843    |            |       |  2.33
+
+Nlocal:    32 ave 32 max 32 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:    59 ave 59 max 59 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    0 ave 0 max 0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+FullNghs:  384 ave 384 max 384 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 384
+Ave neighs/atom = 12
+Neighbor list builds = 12
+Dangerous builds = 0
+unfix getEqu
+
+
+reset_timestep    0
+# -------------- Flux calculation in nve ---------------
+fix nve all nve
+#compute     myKE all ke/atom
+#compute     myPE all pe/atom
+#compute     myStress all stress/atom virial
+#compute      jflux all heat/flux myKE myPE myStress
+#fix ss all ave/correlate 5 20000 100000 vx vy vz type auto file j0jt.txt
+dump lala all custom 1 v1.txt id type vx vy vz
+run             100000
+Per MPI rank memory allocation (min/avg/max) = 4.331 | 4.331 | 4.331 Mbytes
+Step Temp E_pair E_mol TotEng Press 
+       0     245.7219   -50.094924            0   -49.110301    8.2090365 
+   10000    280.81342   -50.235551            0   -49.110314   -69.154774 
+   20000    288.99306   -50.268286            0   -49.110272    242.95244 
+   30000    264.41607   -50.169784            0   -49.110252    16.416859 
+   40000    282.71782   -50.243101            0   -49.110233    135.04069 
+   50000    296.69309   -50.299142            0   -49.110274    211.89284 
+   60000    295.70662   -50.295176            0   -49.110261    174.78832 
+   70000    254.00828   -50.128107            0   -49.110279     231.6857 
+   80000    222.47912   -50.001713            0   -49.110225    217.46877 
+   90000    314.57596   -50.370852            0   -49.110326   -72.069209 
+  100000    323.54409   -50.406744            0   -49.110282   -588.72066 
+Loop time of 3.05492 on 1 procs for 100000 steps with 32 atoms
+
+Performance: 1414.114 ns/day, 0.017 hours/ns, 32734.123 timesteps/s
+95.7% CPU use with 1 MPI tasks x no OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.68649    | 0.68649    | 0.68649    |   0.0 | 22.47
+Neigh   | 0.0012381  | 0.0012381  | 0.0012381  |   0.0 |  0.04
+Comm    | 0.025494   | 0.025494   | 0.025494   |   0.0 |  0.83
+Output  | 2.2917     | 2.2917     | 2.2917     |   0.0 | 75.02
+Modify  | 0.026746   | 0.026746   | 0.026746   |   0.0 |  0.88
+Other   |            | 0.0232     |            |       |  0.76
+
+Nlocal:    32 ave 32 max 32 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:    59 ave 59 max 59 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    0 ave 0 max 0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+FullNghs:  384 ave 384 max 384 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 384
+Ave neighs/atom = 12
+Neighbor list builds = 63
+Dangerous builds = 0
+
+
+Total wall time: 0:00:04

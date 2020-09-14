@@ -1,0 +1,39 @@
+# tensile deformation
+#1 general
+units		metal
+dimension	3
+atom_style      atomic
+neighbor        0.3 bin
+
+#2 structure
+boundary	p p p
+read_data	lammps.dat
+mass		1 72.64
+
+
+#4 potentials
+pair_style      sw
+pair_coeff      * * germanene.sw Ge
+
+velocity  all  create  300 458127641 mom yes  rot yes dist gaussian
+neighbor 2.0 bin
+neigh_modify delay 3
+fix getEqu  all  nvt temp 300 300 .5e-1
+thermo 10000
+timestep .5e-3
+run 100000
+unfix getEqu
+
+
+reset_timestep    0
+# -------------- Flux calculation in nve ---------------
+fix nve all nve
+#compute     myKE all ke/atom
+#compute     myPE all pe/atom
+#compute     myStress all stress/atom virial
+#compute      jflux all heat/flux myKE myPE myStress
+#fix ss all ave/correlate 5 20000 100000 vx vy vz type auto file j0jt.txt
+dump lala all custom 1 v1.txt id type vx vy vz
+run             100000
+
+
